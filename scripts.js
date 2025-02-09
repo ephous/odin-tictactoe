@@ -2,9 +2,15 @@
 ERROR = 0;
 SUCCESS = 1;
 
+// function Player(number){
+//   return {number}
+// }
+
 // create gameBoard using IIFE
 const gameBoard = (function(){
   
+  let winnerFound = false;
+
   // 3x3 for now
   // 0 empty, 1 and 2 are players
   const board =  [
@@ -52,16 +58,26 @@ const gameBoard = (function(){
   //// look for at least one zero
   //const getBoardStatus = () => board.flat().some( x => x==0 );
   
+  const declareOutcome = function() {
+    
+    // if( board.flat().every( x => x!=0 ) ){
+    //   return 'Tie game! Play again?';
+    // }
+    if (winnerFound){
+      return `Player ${ (whosTurn==1) ? 2 : 1 } is victorious! Play again?`
+    } else {
+      return 'Tie game! Play again?';
+    }  
+  }
+
   // look for three in a row
-  const getGameStatus = function() {
+  const isGameOver = function() {
     
     //lots of good solutions here...
     //https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
     function transpose(matrix) {
       return matrix[0].map((col, i) => matrix.map(row => row[i]));
     }
-
-    let winnerFound;
     
     // winner along row
     winnerFound = 1 == board.filter( row => row.every( x => x==1) || row.every( x => x==2) ).length
@@ -95,7 +111,12 @@ const gameBoard = (function(){
       return true;
     }
     
-    // no winner
+    // look for tie
+    if( board.flat().every( x => x!=0 ) ){
+      return true;
+    }
+    
+    // game not over yet...
     return false;
 
   }
@@ -107,7 +128,8 @@ const gameBoard = (function(){
     markSquareByIndex, 
     resetGameBoard, 
     getCurrentPlayer, 
-    getGameStatus, 
+    declareOutcome, 
+    isGameOver,
     getBoardState };
 
 })() /* don't forget to include () to invoke the function */
@@ -137,15 +159,15 @@ function handleGameSpaceClick(event){
   let currentPlayer = gameBoard.getCurrentPlayer();
   if( gameBoard.markSquareByIndex(index), gameSpace ){
     gameSpace.style.background = (currentPlayer==1) ? 'red' : 'blue';
-    if( gameBoard.getGameStatus() ){
+    if( gameBoard.isGameOver() ){
       setTimeout(() => {
-        result = confirm('Winner! Play again?');
+        result = confirm( gameBoard.declareOutcome() );
         if (result) {
           resetGameBoard();
         } else {
           lockGameBoard();
         }  
-      }, 0); // delay of 0ms seems to be sufficient to update square before prompting user
+      }, 10); // delay of 10ms seems to be sufficient to update square before prompting user
     }
   };
 }
@@ -186,7 +208,7 @@ if (document){
         playGame(player);
       };
       
-      if (gameBoard.getGameStatus()) {
+      if (gameBoard.isGameOver()) {
         console.log(`Player ${player} wins!`);
         console.log( gameBoard.getBoardState() );
         rl.close();
