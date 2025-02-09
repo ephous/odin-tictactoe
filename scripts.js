@@ -17,7 +17,9 @@ const gameBoard = (function(){
   let whosTurn = 1;
 
   const resetGameBoard = () => {
-    board.forEach(row => row.forEach( element => element=0 ));
+    // dont reset user...let next player go first
+    board.map( r => r.fill(0) );
+    console.log(board);
   }
 
   const isSquareAvailable = (row,col) => !board[row][col];
@@ -117,14 +119,35 @@ const gameBoard = (function(){
 function lockGameBoard(){
   const container = document.querySelector("#gameboard");
   Array.from(container.children).forEach( gamespace => {
-    gamespace.removeEventListener('click', (event)=>{} )});
+    gamespace.removeEventListener('click', handleGameSpaceClick )});
 }
 
 function resetGameBoard(){
   const container = document.querySelector("#gameboard");
   gameBoard.resetGameBoard();
   Array.from(container.children).forEach( gamespace => {
-    gamespace.style.color='white'});
+    gamespace.style.background='white'});
+}
+
+function handleGameSpaceClick(event){
+  const gameSpace = event.target;
+  const container = document.querySelector("#gameboard");
+  index = Array.from(container.children).indexOf(gameSpace);
+  
+  let currentPlayer = gameBoard.getCurrentPlayer();
+  if( gameBoard.markSquareByIndex(index), gameSpace ){
+    gameSpace.style.background = (currentPlayer==1) ? 'red' : 'blue';
+    if( gameBoard.getGameStatus() ){
+      setTimeout(() => {
+        result = confirm('Winner! Play again?');
+        if (result) {
+          resetGameBoard();
+        } else {
+          lockGameBoard();
+        }  
+      }, 0); // delay of 0ms seems to be sufficient to update square before prompting user
+    }
+  };
 }
 
 if (document){
@@ -134,22 +157,7 @@ if (document){
     
     const container = document.querySelector("#gameboard");
     Array.from(container.children).forEach( (gamespace,index) => {
-      gamespace.addEventListener('click', (event)=>{
-        let currentPlayer = gameBoard.getCurrentPlayer();
-        if( gameBoard.markSquareByIndex(index), event.target ){
-          event.target.style.background = (currentPlayer==1) ? 'red' : 'blue';
-          if( gameBoard.getGameStatus() ){
-            setTimeout(() => {
-              result = confirm('Winner! Play again?');
-              if (result) {
-                resetGameBoard();
-              } else {
-                lockGameBoard();
-              }  
-            }, 0); // delay of 0ms seems to be sufficient to update square before prompting user
-          }
-        };
-      })
+      gamespace.addEventListener('click', handleGameSpaceClick)
     })
   })
 
