@@ -1,0 +1,41 @@
+/* @font-face {
+    font-family: norse-bold;
+    src: url(../fonts/norse-bold-webfont.woff2);
+} */
+
+* {
+    font-family:Arial, Helvetica, sans-serif; /* remove if defining a font-face above */
+    font-size: 1rem;
+    font-weight: normal;
+    letter-spacing: 0.06rem;
+    line-height: 1.2;
+    
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    /* define custom colors*/
+    --blue: #0ea5e9;
+    --gray: #e2e8f0;
+
+}
+
+html,
+body {
+    display: flex;
+    min-height: 95vh;
+    padding: 1.2rem 6rem;
+    /* background-color: black; */
+}
+
+#gameboard{
+    display:grid;
+    gap: 24px;
+    grid-template-columns: repeat(3, 150px); /* https://stackoverflow.com/questions/37502266 */
+    grid-template-rows: repeat(3, 150px);
+}
+
+.gamespace{
+    border: #0ea5e9 solid 4px;
+    border-radius: 12px;
+}
